@@ -1,0 +1,41 @@
+# アクセス禁止設定
+<FilesMatch "^(user-settings\.php|\.htaccess)$">
+    Require all denied
+</FilesMatch>
+
+RewriteEngine On
+RewriteBase /
+
+# bbs以下へのアクセスはここ終了
+RewriteCond %{REQUEST_URI} ^/bbs/
+RewriteRule ^ - [L]
+
+# utilsフォルダへのアクセス禁止
+RewriteRule ^utils/ - [F,L]
+
+# tmpフォルダへのアクセス禁止
+RewriteRule ^tmp/ - [F,L]
+
+# read.cgi リダイレクト
+RewriteRule ^test/read\.cgi/([^/]+)/([0-9]+)/(.*)$ /test/read.php?bbs=$1&thread=$2&option=$3 [R=301,L,QSA]
+
+# bbs.cgi
+RewriteRule ^test/bbs\.cgi$ /test/bbs.php [L,QSA]
+
+# 板フォルダ
+RewriteRule ^([^/]+)/$ /bbs/index.php?bbs=$1 [L,QSA]
+
+# index.html / index.php
+RewriteRule ^([^/]+)/index\.(html|php)$ /bbs/index.php?bbs=$1 [L,QSA]
+
+# head.txt
+RewriteRule ^([^/]+)/head\.txt$ /bbs/head.php?bbs=$1 [L,QSA]
+
+# SETTING.TXT
+RewriteRule ^([^/]+)/SETTING\.TXT$ /bbs/SETTING.php?bbs=$1 [L,QSA]
+
+# subject.txt
+RewriteRule ^([^/]+)/subject\.txt$ /bbs/subject.php?bbs=$1 [L,QSA]
+
+# datファイル
+RewriteRule ^([^/]+)/dat/([0-9]+)\.dat$ /bbs/dat/dat.php?bbs=$1&thread=$2 [L,QSA]

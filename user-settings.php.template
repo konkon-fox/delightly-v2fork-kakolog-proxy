@@ -1,0 +1,15 @@
+<?php
+
+// delightly-v2forkスクリプトが設置されているドメイン
+$DOMAIN = '';
+
+// 自身で指定したシークレットキー
+$YOUR_SECRET_KEY = 'YOUR_SECRET_KEY';
+
+// 過去ログ板化させたくないディレクトリ名
+$excludeBbs = [
+  // 除外したい板のフォルダ名
+];
+
+// ローカルテスト時はhttpにする
+$TARGET_SCHEME = 'https';

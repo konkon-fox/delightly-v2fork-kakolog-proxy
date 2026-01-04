@@ -1,0 +1,60 @@
+  server {
+      listen 80;
+      listen [::]:80;
+      server_name localhost;
+      root /var/www/html;
+      index index.php index.html;
+      
+      # .htaccess へのアクセスを禁止
+      location = /.htaccess {
+          deny all;
+      }
+
+      # user-settings.php へのアクセスを禁止
+      location = /user-settings.php {
+          deny all;
+      }
+
+      # utils フォルダへのアクセスを禁止
+      location ^~ /utils/ {
+          deny all;
+      }
+
+      # tmp フォルダへのアクセスを禁止
+      location ^~ /tmp/ {
+          deny all;
+      }
+
+      # read.cgiへのアクセスをリライト
+      rewrite ^/test/read\.cgi/([^/]+)/([0-9]+)/(.*)$ /test/read.php?bbs=$1&thread=$2&option=$3 permanent;
+
+      # bbs.cgiへのアクセスをリライト
+      rewrite ^/test/bbs\.cgi$ /test/bbs.php last;
+           
+      # 板フォルダへのアクセスをリライト
+      rewrite ^/([^/]+)/$ /bbs/index.php?bbs=$1 last;
+           
+      # index.htmlへのアクセスをリライト
+      rewrite ^/([^/]+)/index\.(html|php)$ /bbs/index.php?bbs=$1 last;
+           
+      # head.txtのアクセスをリライト
+      rewrite ^/([^/]+)/head\.txt$ /bbs/head.php?bbs=$1 last;
+           
+      # SETTING.TXTへのアクセスをリライト
+      rewrite ^/([^/]+)/SETTING\.TXT$ /bbs/SETTING.php?bbs=$1 last;
+           
+      # subject.txtへのアクセスをリライト
+      rewrite ^/([^/]+)/subject\.txt$ /bbs/subject.php?bbs=$1 last;
+           
+      # datへのアクセスをリライト
+      rewrite ^/([^/]+)/dat/([0-9]+)\.dat$ /bbs/dat/dat.php?bbs=$1&thread=$2 last;
+
+      # php基本
+      location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+      }
+  }
