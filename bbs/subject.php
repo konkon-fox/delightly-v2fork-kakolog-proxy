@@ -63,19 +63,25 @@ $data = @file_get_contents($targetUrl, false, $context);
 // レスポンスヘッダーをチェック
 $statusCode = '';
 $lastModified = '';
+$subjectTruncated = '';
 if ($http_response_header) { // ※$http_response_headerはPHP8.5.0で非推奨
     // 最初の要素はステータス
     $statusLine = $http_response_header[0];
     // ステータスコードを取得
     preg_match('/[0-9]{3}/', $statusLine, $matches);
     $statusCode = $matches[0];
-    // Last-Modified取得
+    // ヘッダーから各種値を取得
     foreach ($http_response_header as $header) {
         if (stripos($header, 'Last-Modified:') !== false) {
+            // Last-Modified取得
             $lastModifiedOffset = strpos($header, ':') + 1;
             $lastModified = substr($header, $lastModifiedOffset);
             $lastModified = trim($lastModified);
-            break;
+        } elseif (stripos($header, 'Delightly-Subject-Truncated:') !== false) {
+            // Delightly-Subject-Truncated取得
+            $subjectTruncatedOffset = strpos($header, ':') + 1;
+            $subjectTruncated = substr($header, $subjectTruncatedOffset);
+            $subjectTruncated = trim($subjectTruncated);
         }
     }
 }
@@ -106,8 +112,10 @@ if ($statusCode === '304') {
 // 一度utf-8に戻す
 $utf8Str = mb_convert_encoding($data, 'UTF-8', 'SJIS-win');
 
-// ゴミを取り除く
-$utf8Str = preg_replace('/\A.*\n/', '', $utf8Str);
+// 部分返却の場合ゴミを取り除く
+if ($subjectTruncated === 'true') {
+    $utf8Str = preg_replace('/\A.*\n/', '', $utf8Str);
+}
 
 // 配列化
 $utf8Array = explode("\n", $utf8Str);
