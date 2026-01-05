@@ -61,6 +61,36 @@
 
 ## 処理フロー
 
+### dat.php, head.php, SETTING.php, index.php
+
+```mermaid
+sequenceDiagram
+    box "ユーザー"
+        participant 専ブラ
+    end
+
+    box "プロキシ"
+        participant ***.php
+    end
+
+    box "掲示板"
+        participant 元ファイル
+    end
+
+    専ブラ->>***.php: ファイル 要求
+    ***.php->>元ファイル: ファイル 要求
+    元ファイル->>***.php: 最新データ
+
+    break 304 Not Modified
+        ***.php-->>専ブラ: HTTP 304
+    end
+
+    Note over ***.php: 必要なら加工
+    ***.php-->>専ブラ: Shift_JIS 加工済みデータ
+```
+
+### subject.php
+
 ```mermaid
 sequenceDiagram
     box "ユーザー"
@@ -98,6 +128,14 @@ sequenceDiagram
     Note over subject.php: 逆順ソート・加工・キャッシュ保存
     subject.php-->>専ブラ: Shift_JIS 加工済みデータ
 ```
+
+### bbs.php
+
+- 書き込み処理を拒否
+
+### read.php
+
+- 掲示板 URL へリダイレクト
 
 ## Lisence
 
