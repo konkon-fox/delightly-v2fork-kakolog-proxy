@@ -120,7 +120,6 @@ if ($subjectTruncated === 'true') {
 // 配列化
 $utf8Array = explode("\n", $utf8Str);
 $utf8Array = array_filter($utf8Array);
-$utf8Array = array_reverse($utf8Array);
 
 // 文字列化
 $utf8Str = implode("\n", $utf8Array) . "\n";
