@@ -12,8 +12,8 @@
 
 ## 動作環境
 
-- **PHP 8.0** で確認済み
-- [delightly-v2fork](https://github.com/konkon-fox/delightly-v2fork) **v3.6.0-dev** 以上
+- **PHP 8.1** で確認済み
+- [delightly-v2fork](https://github.com/konkon-fox/delightly-v2fork) **v4.0.0-dev** 以上
 
 ## 設定・設置
 
@@ -57,11 +57,11 @@
 ## 仕様
 
 - このプロキシは 60 秒間のキャッシュを持ちます(`/tmp/`)。
-- 取得する`subject.txt`は末尾から約 20MB の制限があります。
+- 取得する`subject.txt`は最新から20万件の制限があります。
 
 ## 処理フロー
 
-### dat.php, head.php, SETTING.php, index.php
+### head.php, SETTING.php, index.php
 
 ```mermaid
 sequenceDiagram
@@ -87,6 +87,36 @@ sequenceDiagram
 
     Note over ***.php: 必要なら加工
     ***.php-->>専ブラ: Shift_JIS 加工済みデータ
+```
+
+### dat.php
+
+```mermaid
+sequenceDiagram
+    box "ユーザー"
+        participant 専ブラ
+    end
+
+    box "プロキシ"
+        participant dat/dat.php
+        participant kako/dat.php
+    end
+
+    box "掲示板"
+        participant 元ファイル
+    end
+
+    専ブラ->>dat/dat.php: ファイル 要求
+    dat/dat.php->>kako/dat.php: HTTP 302<br>※DAT落ち判定
+    kako/dat.php->>元ファイル: ファイル 要求
+    元ファイル->>kako/dat.php: 最新データ
+
+    break 304 Not Modified
+        kako/dat.php->>専ブラ: HTTP 304
+    end
+
+    Note over kako/dat.php: 必要なら加工
+    kako/dat.php-->>専ブラ: Shift_JIS 加工済みデータ
 ```
 
 ### subject.php
