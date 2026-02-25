@@ -49,6 +49,9 @@
       # datへのアクセスをリライト
       rewrite ^/([^/]+)/dat/([0-9]+)\.dat$ /bbs/dat/dat.php?bbs=$1&thread=$2 last;
 
+      # kako datへのアクセスをリライト
+      rewrite ^/([^/]+)/kako/[0-9]+/[0-9]+/([0-9]+)\.dat$ /bbs/kako/dat.php?bbs=$1&thread=$2 last;
+
       # php基本
       location ~ \.php$ {
         try_files $uri =404;
